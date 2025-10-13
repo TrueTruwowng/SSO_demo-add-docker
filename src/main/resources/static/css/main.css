@@ -53,17 +53,17 @@ ul.inline li { background:#222a33; padding:.35rem .65rem; border-radius:5px; fon
 .flex-between { display:flex; justify-content:space-between; align-items:center; }
 .badge.gray { background:#303b47; }
 /* Profile overview additions */
-.profile-overview { display:flex; gap:1.2rem; align-items:flex-start; flex-wrap:wrap; }
-.avatar-wrapper { position:relative; }
-.avatar { width:120px; height:120px; border-radius:50%; object-fit:cover; background:#182028; border:2px solid #2c3541; box-shadow:0 4px 10px -4px rgba(0,0,0,.6); }
-.avatar.fallback { display:flex; align-items:center; justify-content:center; font-size:2.8rem; font-weight:600; color:#fff; background:linear-gradient(135deg,#305080,#1e2935); }
-.profile-meta { flex:1 1 260px; min-width:240px; }
-.profile-meta h2 { margin:.2rem 0 .6rem 0; font-size:1.3rem; }
-.meta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.6rem .9rem; margin-top:.6rem; }
-.meta-item { background:#182028; padding:.55rem .7rem; border:1px solid #24303d; border-radius:6px; font-size:.72rem; line-height:1.25; position:relative; }
-.meta-item strong { display:block; font-size:.65rem; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:.2rem; }
-.copy-btn-inline { position:absolute; top:6px; right:6px; background:rgba(255,255,255,.07); border:none; color:var(--text); font-size:.55rem; padding:.25rem .4rem; border-radius:4px; cursor:pointer; }
-.copy-btn-inline:hover { background:rgba(255,255,255,.15); }
-.scope-wrap { display:flex; flex-wrap:wrap; gap:4px; }
-.scope-chip { background:#263445; padding:2px 6px; border-radius:4px; font-size:.6rem; }
+.profile-overview { display:flex; gap:2rem; align-items:center; }
+.avatar-wrapper { display:flex; align-items:center; justify-content:center; margin-right:1.5rem; }
+.avatar { width:72px; height:72px; border-radius:50%; object-fit:cover; background:#222; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+.avatar.fallback { display:flex; align-items:center; justify-content:center; font-size:2.2rem; font-weight:700; background:#2d3744; color:#fff; }
+.profile-meta { flex:1; }
+.meta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-top:.7rem; }
+.meta-item { background:#181e26; padding:.6rem .8rem; border-radius:6px; font-size:.9rem; }
+.claims-grid { display:grid; grid-template-columns:1fr 2fr; gap:.5rem; margin-top:1.2rem; }
+.claim-row { display:contents; }
+.claim-key { font-weight:600; color:var(--accent); background:#181e26; padding:.4rem .7rem; border-radius:5px 0 0 5px; }
+.claim-value { background:#222a33; padding:.4rem .7rem; border-radius:0 5px 5px 0; word-break:break-all; }
+.copy-btn-inline { background:var(--accent); color:#fff; border:none; border-radius:4px; padding:.2rem .5rem; font-size:.7rem; margin-left:.5rem; cursor:pointer; }
+.copy-btn-inline:hover { background:#3774e6; }
 .separator-thin { height:1px; background:#2a333d; margin:1.2rem 0; }

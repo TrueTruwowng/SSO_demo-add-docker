@@ -33,7 +33,6 @@
         </div>
         <div th:if="${!auth0Configured and !googleConfigured and !githubConfigured}" class="alert" style="margin-top:1rem;">No provider configured. Set environment variables and restart.</div>
     </div>
-
     <div class="grid api-grid">
         <div class="panel">
             <h2>Provider Status</h2>
@@ -48,45 +47,18 @@
             <p class="small">Restart the app after changing environment variables.</p>
         </div>
         <div class="panel">
-            <h2>Quick Links</h2>
-            <ul>
-                <li><a th:href="@{/api/public}" target="_blank">/api/public</a></li>
-                <li><a th:href="@{/api/private}" target="_blank">/api/private (Requires Auth)</a></li>
-                <li><a th:href="@{/debug/oauth2/clients}" target="_blank">/debug/oauth2/clients</a></li>
-            </ul>
-            <p class="notice small">The private API returns 401 if you are not authenticated.</p>
-        </div>
-        <div class="panel">
             <h2>API Tester</h2>
-            <form id="apiForm" onsubmit="return false;" class="small">
-                <label>Endpoint:
-                    <select id="endpoint" style="margin-top:.3rem; width:100%; background:#10161d; color:#e8ecf2; border:1px solid #2d3744; padding:.4rem .5rem; border-radius:6px;">
-                        <option value="/api/public">/api/public</option>
-                        <option value="/api/private">/api/private</option>
-                    </select>
-                </label>
-                <label style="display:block; margin-top:.6rem;">Method:
-                    <select id="method" style="margin-top:.3rem; width:100%; background:#10161d; color:#e8ecf2; border:1px solid #2d3744; padding:.4rem .5rem; border-radius:6px;">
-                        <option>GET</option>
-                    </select>
-                </label>
-                <button class="btn" style="margin-top:1rem;" onclick="invokeApi()">Send Request</button>
+            <p class="small">Try calling a protected API endpoint below (requires authentication).</p>
+            <form method="get" th:action="@{/api/test}" sec:authorize="isAuthenticated()">
+                <button class="btn" type="submit">Call /api/test</button>
             </form>
-            <pre id="apiResult" style="margin-top:1rem;">Result will appear here...</pre>
-        </div>
-        <div class="panel" sec:authorize="isAuthenticated()">
-            <h2>Session Snapshot</h2>
-            <p class="small">A subset of your claims (truncated):</p>
-            <!-- Replace invalid #objects.nullSafe with Elvis fallback -->
-            <pre th:text="${profile != null ? profile : '{}'}">{ }</pre>
-            <p class="small">See <a th:href="@{/profile}">Profile</a> for full details.</p>
+            <div sec:authorize="!isAuthenticated()" class="notice" style="margin-top:1rem;">Sign in to test API access.</div>
         </div>
     </div>
 </div>
 <footer>
-    <span class="small">SSO Demo &copy; 2025</span>
-    <span class="small">Spring Security • OIDC/OAuth2</span>
+    <span>Demo Security UI</span>
+    <span class="small">&copy; 2025</span>
 </footer>
-<script th:src="@{/js/app.js}"></script>
 </body>
 </html>

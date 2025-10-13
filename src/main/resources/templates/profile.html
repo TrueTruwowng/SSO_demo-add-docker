@@ -50,138 +50,31 @@
                         <strong>Provider Type</strong>
                         <span th:text="${providerType}">OIDC</span>
                     </div>
-                    <div class="meta-item" th:if="${profile['scope'] != null}">
-                        <strong>Scopes</strong>
-                        <div class="scope-wrap" th:with="scopes=${#strings.arraySplit(profile['scope'],' ')}">
-                            <span class="scope-chip" th:each="s : ${scopes}" th:text="${s}">openid</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-        <div class="separator-thin"></div>
-        <p class="small">Thông tin tổng quan lấy từ token / userinfo. Xem chi tiết ở phần Claims bên dưới.</p>
-    </div>
-    <!-- Existing Claims Panel -->
-    <div class="panel" sec:authorize="isAuthenticated()">
-        <div class="flex-between">
-            <h2>Claims / Attributes</h2>
-            <span class="badge" th:text="${#dates.format(#dates.createNow(), 'HH:mm:ss')}">time</span>
-        </div>
-        <p class="small">Dữ liệu phản ánh nội dung claim từ ID Token (OIDC) hoặc userinfo / user attributes từ provider.</p>
-        <pre id="claimsPre" th:text="${profile}">{}</pre>
-    </div>
-    <!-- ID Token Panel -->
-    <div class="panel" sec:authorize="isAuthenticated()">
-        <h2>ID Token</h2>
-        <p class="small">Sao chép token để kiểm tra tại <a href="https://jwt.io" target="_blank" rel="noopener">jwt.io</a>. Ẩn / hiện để bảo mật tại chỗ.</p>
-        <div class="flex gap" style="margin-bottom:.6rem; flex-wrap:wrap;">
-            <button class="btn small" onclick="copyIdToken()">Copy</button>
-            <button class="btn ghost small" onclick="toggleToken()" id="toggleBtn">Hide</button>
-        </div>
-        <textarea id="idTokenBox" th:text="${idToken}" style="width:100%;height:180px" spellcheck="false"></textarea>
-    </div>
-    <!-- Detailed ID Token decoding panel -->
-    <div class="panel" sec:authorize="isAuthenticated()">
-        <h2>ID Token Details</h2>
-        <p class="small">Giải mã cục bộ (KHÔNG xác thực chữ ký). Không dùng cho mục đích bảo mật cuối cùng.</p>
-        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem;">
-            <div>
-                <h3 style="margin-top:0;font-size:.85rem;">Header</h3>
-                <pre id="jwtHeader">{}</pre>
-                <button class="btn small" onclick="copyText('jwtHeader')">Copy Header</button>
-            </div>
-            <div>
-                <h3 style="margin-top:0;font-size:.85rem;">Payload</h3>
-                <pre id="jwtPayload">{}</pre>
-                <button class="btn small" onclick="copyText('jwtPayload')">Copy Payload</button>
-            </div>
-        </div>
         <hr />
-        <h3 style="margin-top:.2rem;font-size:.9rem;">Core Claims</h3>
-        <table class="table" style="font-size:.7rem;">
-            <thead><tr><th>Claim</th><th>Value</th><th>Info</th></tr></thead>
-            <tbody id="claimTableBody"></tbody>
-        </table>
-        <p class="notice small" id="expNote"></p>
-    </div>
-    <div class="panel" sec:authorize="isAuthenticated()">
-        <h2>Session Utilities</h2>
-        <ul class="inline">
-            <li><a th:href="@{/api/private}" target="_blank">Call /api/private</a></li>
-            <li><a th:href="@{/debug/oauth2/clients}" target="_blank">View Clients</a></li>
-        </ul>
-        <p class="small">Đăng xuất sẽ xóa phiên cục bộ và cookie JSESSIONID.</p>
+        <h3>Claims / Attributes</h3>
+        <div class="claims-grid">
+            <div class="claim-row" th:each="claim : ${claims}">
+                <div class="claim-key" th:text="${claim.key}"></div>
+                <div class="claim-value" th:text="${claim.value}"></div>
+            </div>
+        </div>
     </div>
 </div>
 <footer>
-    <span class="small">SSO Demo • Profile</span>
+    <span>Demo Security UI</span>
     <span class="small">&copy; 2025</span>
 </footer>
-<script th:src="@{/js/app.js}"></script>
 <script>
-function copyIdToken(){
-  const el = document.getElementById('idTokenBox');
-  if(!el) return; el.select(); document.execCommand('copy');
+function copyInline(btn) {
+    var targetId = btn.getAttribute('data-target');
+    var val = document.getElementById(targetId).innerText;
+    navigator.clipboard.writeText(val);
+    btn.innerText = 'Copied!';
+    setTimeout(function(){ btn.innerText = 'Copy'; }, 1200);
 }
-function toggleToken(){
-  const box = document.getElementById('idTokenBox');
-  const btn = document.getElementById('toggleBtn');
-  if(!box || !btn) return;
-  if(box.getAttribute('data-hidden') === '1'){
-    box.value = box.getAttribute('data-original') || box.value;
-    box.removeAttribute('data-hidden');
-    btn.textContent = 'Hide';
-  } else {
-    box.setAttribute('data-original', box.value);
-    box.value = '(hidden)';
-    box.setAttribute('data-hidden','1');
-    btn.textContent = 'Show';
-  }
-}
-function copyText(id){
-  const el = document.getElementById(id); if(!el) return; const range = document.createRange(); range.selectNodeContents(el); const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(range); try{document.execCommand('copy');}catch(e){} sel.removeAllRanges(); }
-function copyInline(btn){
-  const targetId = btn.getAttribute('data-target');
-  const el = document.getElementById(targetId); if(!el) return;
-  const range = document.createRange(); range.selectNodeContents(el); const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(range); try{document.execCommand('copy');}catch(e){} sel.removeAllRanges();
-  btn.textContent='Copied'; setTimeout(()=>btn.textContent='Copy',1200);
-}
-function b64UrlDecode(str){
-  try { return atob(str.replace(/-/g,'+').replace(/_/g,'/')); } catch(e){ return '{}'; }
-}
-function safeJson(str){ try { return JSON.parse(str); } catch(e){ return {}; } }
-function renderJwt(){
-  const box = document.getElementById('idTokenBox'); if(!box) return;
-  const token = (box.getAttribute('data-hidden')==='1'? box.getAttribute('data-original'): box.value)||'';
-  if(!token || token.startsWith('(Không') || token==='(hidden)'){ return; }
-  const parts = token.split('.'); if(parts.length < 2) return;
-  const header = safeJson(b64UrlDecode(parts[0]));
-  const payload = safeJson(b64UrlDecode(parts[1]));
-  document.getElementById('jwtHeader').textContent = JSON.stringify(header,null,2);
-  document.getElementById('jwtPayload').textContent = JSON.stringify(payload,null,2);
-  const tbody = document.getElementById('claimTableBody');
-  tbody.innerHTML='';
-  const core = ['iss','sub','aud','exp','iat','nbf','azp','scope','sid','email','name'];
-  core.forEach(k=>{
-    if(payload[k]!==undefined){
-      let info='';
-      if(k==='exp'||k==='iat'||k==='nbf'){ const dt=new Date(payload[k]*1000); info=dt.toLocaleString(); }
-      const tr=document.createElement('tr');
-      const val = (typeof payload[k]==='object')? JSON.stringify(payload[k]) : payload[k];
-      tr.innerHTML = `<td>${k}</td><td style="word-break:break-all;">${val}</td><td>${info}</td>`;
-      tbody.appendChild(tr);
-    }
-  });
-  if(payload.exp){
-    const nowSec = Math.floor(Date.now()/1000);
-    const diff = payload.exp - nowSec;
-    let msg = diff>0? `Token expires in ${diff}s (~${Math.round(diff/60)} min)` : `Token EXPIRED ${Math.abs(diff)}s ago`;
-    const note = document.getElementById('expNote'); if(note) note.textContent = msg;
-  }
-}
-renderJwt();
-setTimeout(renderJwt, 500);
 </script>
 </body>
 </html>
