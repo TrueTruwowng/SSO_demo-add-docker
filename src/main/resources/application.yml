@@ -39,9 +39,29 @@ spring:
           # Avoid discovery; rely on explicit JWKS endpoint (Auth0 only). If using only Google/GitHub login (session based), can remove.
           jwk-set-uri: https://${AUTH0_DOMAIN:example.invalid}/.well-known/jwks.json
 
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_security_demo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:1}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 # Custom property for audience (API Identifier in Auth0) if you need access tokens for API calls
 auth0:
   audience: ${AUTH0_AUDIENCE:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
 
 logging:
   level:

@@ -33,11 +33,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   ClientRegistrationRepository clientRegistrationRepository) throws Exception {
+                                                   ClientRegistrationRepository clientRegistrationRepository,
+                                                   OAuth2LoginSuccessHandler successHandler) throws Exception {
         // @formatter:off
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/error", "/api/public", "/debug/oauth2/clients").permitAll()
+                // allow health and metrics for k8s probes and monitoring
+                .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
+                // allow registration endpoint (demo only)
+                .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/private").authenticated()
                 .anyRequest().authenticated()
             )
@@ -46,15 +51,14 @@ public class SecurityConfig {
             )
             .oauth2Login(oauth2 -> {
                 oauth2.loginPage("/login");
-                if (audience != null && !audience.isBlank() && isDomainConfigured(auth0Domain)) {
-                    OAuth2AuthorizationRequestResolver base =
+                oauth2.successHandler(successHandler);
+                OAuth2AuthorizationRequestResolver base =
                         new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
-                    if (base instanceof DefaultOAuth2AuthorizationRequestResolver def) {
-                        def.setAuthorizationRequestCustomizer(builder ->
-                            builder.additionalParameters(params -> params.put("audience", audience))
-                        );
-                        oauth2.authorizationEndpoint(cfg -> cfg.authorizationRequestResolver(def));
-                    }
+                if (audience != null && !audience.isBlank() && isDomainConfigured(auth0Domain) && base instanceof DefaultOAuth2AuthorizationRequestResolver def) {
+                    def.setAuthorizationRequestCustomizer(builder ->
+                        builder.additionalParameters(params -> params.put("audience", audience))
+                    );
+                    oauth2.authorizationEndpoint(cfg -> cfg.authorizationRequestResolver(def));
                 }
             })
             .oauth2Client(Customizer.withDefaults())
